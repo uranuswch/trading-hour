@@ -1,0 +1,13 @@
+market: KRX
+timezone: Asia/Seoul
+weekly_schedule:
+  monday: &kr_full
+    - {session: premarket,  start: "08:00", end: "09:00"}
+    - {session: regular,    start: "09:00", end: "15:30"}
+    - {session: postmarket, start: "15:40", end: "18:00"}
+  tuesday: *kr_full
+  wednesday: *kr_full
+  thursday: *kr_full
+  friday: *kr_full
+  saturday: []
+  sunday: []
