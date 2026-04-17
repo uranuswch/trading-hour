@@ -72,7 +72,26 @@ func IsOpen(unixSec int64, m MarketType) (Status, error) {
 	return Status{Open: false, Session: SessionClosed, Market: m}, nil
 }
 
+// Timeline returns the full day schedule for the given date, interpreted in the
+// market's local timezone (only Y/M/D of date is used; hour/min/sec/loc are ignored).
+func Timeline(date time.Time, m MarketType) (DaySchedule, error) {
+	mkt, err := lookup(m)
+	if err != nil {
+		return DaySchedule{}, err
+	}
+	y, mo, d := date.Date()
+	localMidnight := time.Date(y, mo, d, 0, 0, 0, 0, mkt.Location)
+	phases, isHoliday, isHalfDay, name := mkt.materialize(localMidnight)
+	return DaySchedule{
+		Date:        localMidnight,
+		Market:      m,
+		Phases:      phases,
+		IsHoliday:   isHoliday,
+		IsHalfDay:   isHalfDay,
+		HolidayName: name,
+	}, nil
+}
+
 // Placeholder stubs so the API surface exists; real implementations come in later tasks.
-func Timeline(date time.Time, m MarketType) (DaySchedule, error)  { panic("not implemented") }
 func NextOpen(unixSec int64, m MarketType) (time.Time, error)     { panic("not implemented") }
 func NextClose(unixSec int64, m MarketType) (time.Time, error)    { panic("not implemented") }
