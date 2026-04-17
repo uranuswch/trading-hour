@@ -8,7 +8,7 @@ Pre-implementation. The approved design is at [docs/superpowers/specs/2026-04-17
 
 ## MVP markets
 
-NASDAQ (including BOAT overnight), HKEX, China A-Share (SSE+SZSE), TSE (Tokyo), KRX (Korea).
+NASDAQ (including BOAT overnight), HKEX, China A-Share (SSE+SZSE), TSE (Tokyo), KRX (Korea), Rates (interest rate products), Metals (spot gold/silver).
 
 ## Layout (target)
 
