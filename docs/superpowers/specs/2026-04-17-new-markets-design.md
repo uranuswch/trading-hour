@@ -53,7 +53,7 @@ weekly_schedule:
 - **Timezone:** `America/New_York`
 - **Source:** Pyth "WTI Crude (CME)" section
 - **Pattern:** 24/5 with 1-hour daily maintenance window Mon–Thu 17:00–18:00 ET.
-- **Holidays:** CME holiday calendar (`exchange_calendars` code `XCME`)
+- **Holidays:** CME holiday calendar (`exchange_calendars` code `CME`)
 
 ```yaml
 market: CME
@@ -75,7 +75,7 @@ weekly_schedule:
 - **Timezone:** `America/New_York`
 - **Source:** Pyth "Brent Crude (ICE)" section
 - **Pattern:** 24/5 with 2-hour daily maintenance window Mon–Thu 18:00–20:00 ET.
-- **Holidays:** ICE Futures Europe calendar (`exchange_calendars` code `IFEU`)
+- **Holidays:** ICE Futures Europe calendar (`exchange_calendars` code `XICE`)
 
 ```yaml
 market: ICE
@@ -159,7 +159,7 @@ weekly_schedule:
 - **Timezone:** `America/New_York`
 - **Source:** Pyth "Metals" section
 - **Pattern:** Identical to CME: Sun 18:00 ET open, daily 1-hour maintenance Mon–Thu 17:00–18:00 ET, Fri 17:00 ET close.
-- **Holidays:** CME holiday calendar (`exchange_calendars` code `XCME`)
+- **Holidays:** CME holiday calendar (`exchange_calendars` code `CME`)
 
 ```yaml
 market: Metals
@@ -181,22 +181,22 @@ weekly_schedule:
 | Market | `exchange_calendars` code | Method |
 |---|---|---|
 | FX | — | Hand-curated: Christmas Day + New Year's Day |
-| CME | `XCME` | `exchange_calendars` |
-| ICE | `IFEU` | `exchange_calendars` |
+| CME | `CME` | `exchange_calendars` |
+| ICE | `XICE` | `exchange_calendars` |
 | FXCMUKOil | — | Hand-curated: Christmas Day + New Year's Day |
 | FXCMUSOil | — | Hand-curated: Christmas Day + New Year's Day |
 | Rates | `XNYS` | `exchange_calendars` |
-| Metals | `XCME` | `exchange_calendars` |
+| Metals | `CME` | `exchange_calendars` |
 
 **`scripts/refresh_holidays.py` additions:**
 
 ```python
 MARKETS = {
     # existing ...
-    "CME":    ("XCME", "cme"),
-    "ICE":    ("IFEU", "ice"),
+    "CME":    ("CME", "cme"),
+    "ICE":    ("XICE", "ice"),
     "Rates":  ("XNYS", "rates"),
-    "Metals": ("XCME", "metals"),
+    "Metals": ("CME", "metals"),
 }
 ```
 
