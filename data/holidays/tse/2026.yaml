@@ -1,21 +1,60 @@
 market: TSE
 year: 2026
 holidays:
-  - {date: "2026-01-01", name: "New Year's Day",     type: closed}
-  - {date: "2026-01-02", name: "Bank holiday",       type: closed}
-  - {date: "2026-01-12", name: "Coming of Age Day",  type: closed}
-  - {date: "2026-02-11", name: "Foundation Day",     type: closed}
-  - {date: "2026-02-23", name: "Emperor's Birthday", type: closed}
-  - {date: "2026-03-20", name: "Vernal Equinox",     type: closed}
-  - {date: "2026-04-29", name: "Showa Day",          type: closed}
-  - {date: "2026-05-04", name: "Greenery Day",       type: closed}
-  - {date: "2026-05-05", name: "Children's Day",     type: closed}
-  - {date: "2026-05-06", name: "Constitution Day (obs.)", type: closed}
-  - {date: "2026-07-20", name: "Marine Day",         type: closed}
-  - {date: "2026-08-11", name: "Mountain Day",       type: closed}
-  - {date: "2026-09-21", name: "Respect for the Aged Day", type: closed}
-  - {date: "2026-09-22", name: "Autumnal Equinox",   type: closed}
-  - {date: "2026-10-12", name: "Health-Sports Day",  type: closed}
-  - {date: "2026-11-03", name: "Culture Day",        type: closed}
-  - {date: "2026-11-23", name: "Labour Thanksgiving", type: closed}
-  - {date: "2026-12-31", name: "Year-end holiday",   type: closed}
+- date: '2026-01-01'
+  name: Market holiday
+  type: closed
+- date: '2026-01-02'
+  name: Market holiday
+  type: closed
+- date: '2026-01-12'
+  name: Market holiday
+  type: closed
+- date: '2026-02-11'
+  name: Market holiday
+  type: closed
+- date: '2026-02-23'
+  name: Market holiday
+  type: closed
+- date: '2026-03-20'
+  name: Market holiday
+  type: closed
+- date: '2026-04-29'
+  name: Market holiday
+  type: closed
+- date: '2026-05-04'
+  name: Market holiday
+  type: closed
+- date: '2026-05-05'
+  name: Market holiday
+  type: closed
+- date: '2026-05-06'
+  name: Market holiday
+  type: closed
+- date: '2026-07-20'
+  name: Market holiday
+  type: closed
+- date: '2026-08-11'
+  name: Market holiday
+  type: closed
+- date: '2026-09-21'
+  name: Market holiday
+  type: closed
+- date: '2026-09-22'
+  name: Market holiday
+  type: closed
+- date: '2026-09-23'
+  name: Market holiday
+  type: closed
+- date: '2026-10-12'
+  name: Market holiday
+  type: closed
+- date: '2026-11-03'
+  name: Market holiday
+  type: closed
+- date: '2026-11-23'
+  name: Market holiday
+  type: closed
+- date: '2026-12-31'
+  name: Market holiday
+  type: closed

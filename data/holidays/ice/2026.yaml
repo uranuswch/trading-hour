@@ -1,11 +1,42 @@
 market: ICE
 year: 2026
 holidays:
-  - {date: "2026-01-01", name: "New Year's Day",         type: closed}
-  - {date: "2026-04-03", name: "Good Friday",            type: closed}
-  - {date: "2026-04-06", name: "Easter Monday",          type: closed}
-  - {date: "2026-05-04", name: "Early May Bank Holiday", type: closed}
-  - {date: "2026-05-25", name: "Spring Bank Holiday",    type: closed}
-  - {date: "2026-08-31", name: "Summer Bank Holiday",    type: closed}
-  - {date: "2026-12-25", name: "Christmas Day",          type: closed}
-  - {date: "2026-12-28", name: "Boxing Day (observed)",  type: closed}
+- date: '2026-01-01'
+  name: Market holiday
+  type: closed
+- date: '2026-04-02'
+  name: Market holiday
+  type: closed
+- date: '2026-04-03'
+  name: Market holiday
+  type: closed
+- date: '2026-04-06'
+  name: Market holiday
+  type: closed
+- date: '2026-04-23'
+  name: Market holiday
+  type: closed
+- date: '2026-05-01'
+  name: Market holiday
+  type: closed
+- date: '2026-05-14'
+  name: Market holiday
+  type: closed
+- date: '2026-05-25'
+  name: Market holiday
+  type: closed
+- date: '2026-06-17'
+  name: Market holiday
+  type: closed
+- date: '2026-08-03'
+  name: Market holiday
+  type: closed
+- date: '2026-12-24'
+  name: Market holiday
+  type: closed
+- date: '2026-12-25'
+  name: Market holiday
+  type: closed
+- date: '2026-12-31'
+  name: Market holiday
+  type: closed
