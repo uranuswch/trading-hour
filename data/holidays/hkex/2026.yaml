@@ -1,0 +1,20 @@
+market: HKEX
+year: 2026
+holidays:
+  - {date: "2026-01-01", name: "New Year's Day",           type: closed}
+  - {date: "2026-02-17", name: "Lunar New Year Day 1",     type: closed}
+  - {date: "2026-02-18", name: "Lunar New Year Day 2",     type: closed}
+  - {date: "2026-02-19", name: "Lunar New Year Day 3",     type: closed}
+  - {date: "2026-04-03", name: "Good Friday",              type: closed}
+  - {date: "2026-04-06", name: "Easter Monday",            type: closed}
+  - {date: "2026-04-07", name: "Ching Ming Festival (obs.)", type: closed}
+  - {date: "2026-05-01", name: "Labour Day",               type: closed}
+  - {date: "2026-05-25", name: "Buddha's Birthday",        type: closed}
+  - {date: "2026-06-19", name: "Tuen Ng Festival",         type: closed}
+  - {date: "2026-07-01", name: "HKSAR Establishment Day",  type: closed}
+  - {date: "2026-09-25", name: "Day after Mid-Autumn",     type: closed}
+  - {date: "2026-10-01", name: "National Day",             type: closed}
+  - {date: "2026-10-19", name: "Chung Yeung Festival",     type: closed}
+  - {date: "2026-12-24", name: "Christmas Eve",            type: half_day}
+  - {date: "2026-12-25", name: "Christmas Day",            type: closed}
+  - {date: "2026-12-26", name: "Boxing Day (obs.)",        type: closed}

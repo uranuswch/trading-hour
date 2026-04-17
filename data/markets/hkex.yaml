@@ -1,0 +1,14 @@
+market: HKEX
+timezone: Asia/Hong_Kong
+weekly_schedule:
+  monday: &hk_full
+    - {session: regular, start: "09:30", end: "12:00"}
+    - {session: regular, start: "13:00", end: "16:10"}
+  tuesday: *hk_full
+  wednesday: *hk_full
+  thursday: *hk_full
+  friday: *hk_full
+  saturday: []
+  sunday: []
+half_day_schedule:
+  - {session: regular, start: "09:30", end: "12:00"}
