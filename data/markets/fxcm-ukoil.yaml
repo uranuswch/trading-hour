@@ -1,0 +1,10 @@
+market: FXCMUKOil
+timezone: UTC
+weekly_schedule:
+  sunday:    []
+  monday:    &ukoil_weekday [{session: continuous, start: "01:00", end: "22:00"}]
+  tuesday:   *ukoil_weekday
+  wednesday: *ukoil_weekday
+  thursday:  *ukoil_weekday
+  friday:    [{session: continuous, start: "01:00", end: "21:45"}]
+  saturday:  []
