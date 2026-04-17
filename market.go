@@ -22,3 +22,31 @@ func lookup(m MarketType) (*Market, error) {
 	}
 	return mkt, nil
 }
+
+// materialize returns the phases for `date` in this market's local timezone,
+// plus holiday flags. The input date's Y/M/D is used; its hour/min are ignored.
+func (m *Market) materialize(date time.Time) (phases []Phase, isHoliday bool, isHalfDay bool, name string) {
+	y, mo, d := date.Date()
+	localMidnight := time.Date(y, mo, d, 0, 0, 0, 0, m.Location)
+
+	cd := civilDate{year: y, month: int(mo), day: d}
+	if h, ok := m.Holidays[cd]; ok {
+		switch h.Type {
+		case HolidayClosed:
+			return nil, true, false, h.Name
+		case HolidayHalfDay:
+			return instantiateAll(m.HalfDayPhases, localMidnight, m.Location), false, true, h.Name
+		}
+	}
+
+	base := m.WeeklyPhases[int(localMidnight.Weekday())]
+	return instantiateAll(base, localMidnight, m.Location), false, false, ""
+}
+
+func instantiateAll(cps []compiledPhase, date time.Time, loc *time.Location) []Phase {
+	out := make([]Phase, len(cps))
+	for i, c := range cps {
+		out[i] = c.instantiate(date, loc)
+	}
+	return out
+}
