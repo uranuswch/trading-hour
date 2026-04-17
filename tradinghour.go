@@ -15,6 +15,13 @@ const (
 	MarketChinaAShare MarketType = "ChinaAShare"
 	MarketTSE         MarketType = "TSE"
 	MarketKRX         MarketType = "KRX"
+	MarketFX          MarketType = "FX"
+	MarketCME         MarketType = "CME"
+	MarketICE         MarketType = "ICE"
+	MarketFXCMUKOil   MarketType = "FXCMUKOil"
+	MarketFXCMUSOil   MarketType = "FXCMUSOil"
+	MarketRates       MarketType = "Rates"
+	MarketMetals      MarketType = "Metals"
 )
 
 // Session identifies a market phase at a given instant.
@@ -26,6 +33,7 @@ const (
 	SessionRegular    Session = "regular"
 	SessionPostMarket Session = "postmarket"
 	SessionOvernight  Session = "overnight"
+	SessionContinuous Session = "continuous"
 )
 
 // Status is the result of IsOpen.
