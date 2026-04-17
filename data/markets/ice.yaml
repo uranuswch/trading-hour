@@ -1,0 +1,12 @@
+market: ICE
+timezone: America/New_York
+weekly_schedule:
+  sunday:    [{session: continuous, start: "18:00", end: "00:00+1"}]
+  monday:    &ice_weekday
+    - {session: continuous, start: "00:00", end: "18:00"}
+    - {session: continuous, start: "20:00", end: "00:00+1"}
+  tuesday:   *ice_weekday
+  wednesday: *ice_weekday
+  thursday:  *ice_weekday
+  friday:    [{session: continuous, start: "00:00", end: "18:00"}]
+  saturday:  []
