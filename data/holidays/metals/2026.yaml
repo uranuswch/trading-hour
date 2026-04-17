@@ -5,29 +5,26 @@ holidays:
   name: Market holiday
   type: closed
 - date: '2026-01-19'
-  name: Market holiday
-  type: closed
+  name: Early close
+  type: half_day
 - date: '2026-02-16'
-  name: Market holiday
-  type: closed
+  name: Early close
+  type: half_day
 - date: '2026-04-03'
   name: Market holiday
   type: closed
 - date: '2026-05-25'
-  name: Market holiday
-  type: closed
-- date: '2026-06-19'
-  name: Market holiday
-  type: closed
+  name: Early close
+  type: half_day
 - date: '2026-07-03'
-  name: Market holiday
-  type: closed
+  name: Early close
+  type: half_day
 - date: '2026-09-07'
-  name: Market holiday
-  type: closed
+  name: Early close
+  type: half_day
 - date: '2026-11-26'
-  name: Market holiday
-  type: closed
+  name: Early close
+  type: half_day
 - date: '2026-11-27'
   name: Early close
   type: half_day
