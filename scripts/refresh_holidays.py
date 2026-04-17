@@ -22,10 +22,10 @@ MARKETS = {
     "ChinaAShare": ("XSHG", "china-ashare"),
     "TSE":         ("XTKS", "tse"),
     "KRX":         ("XKRX", "krx"),
-    "CME":         ("CMES", "cme"),
-    "ICE":         ("XICE", "ice"),
+    "CME":         ("XCME", "cme"),
+    "ICE":         ("IFEU", "ice"),
     "Rates":       ("XNYS", "rates"),
-    "Metals":      ("XNYS", "metals"),
+    "Metals":      ("XCME", "metals"),
 }
 
 # Known half-day markets and their fallback "early close" detection.
