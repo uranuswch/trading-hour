@@ -2,6 +2,9 @@
 *.exe
 *.test
 *.out
+/is_open
+/new_markets
+/timeline
 
 # Editor
 .idea/

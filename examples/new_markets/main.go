@@ -11,7 +11,8 @@ import (
 func main() {
 	// Demonstrate the new Rates and Metals markets
 
-	fmt.Println("=== New Markets: Rates and Metals ===\n")
+	fmt.Println("=== New Markets: Rates and Metals ===")
+	fmt.Println()
 
 	// Example 1: Check Rates market (interest rate products)
 	// Rates uses standard business hours: Mon-Fri 8am-5pm ET

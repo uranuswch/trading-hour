@@ -63,6 +63,10 @@ type DaySchedule struct {
 // ErrUnknownMarket is returned for any API call with an unknown MarketType.
 var ErrUnknownMarket = errors.New("tradinghour: unknown market")
 
+// ErrNoOpenFound is returned by NextOpen/NextClose when no open phase is found
+// within the search horizon.
+var ErrNoOpenFound = errors.New("tradinghour: no open phase found within search horizon")
+
 // IsOpen reports the market's status at the given absolute instant.
 func IsOpen(unixSec int64, m MarketType) (Status, error) {
 	mkt, err := lookup(m)
@@ -72,7 +76,12 @@ func IsOpen(unixSec int64, m MarketType) (Status, error) {
 	t := time.Unix(unixSec, 0).In(mkt.Location)
 	today, _, _, _ := mkt.materialize(t)
 	yesterday, _, _, _ := mkt.materialize(t.AddDate(0, 0, -1))
-	for _, p := range append(yesterday, today...) {
+	for _, p := range yesterday {
+		if (t.Equal(p.Start) || t.After(p.Start)) && t.Before(p.End) {
+			return Status{Open: true, Session: p.Session, Market: m}, nil
+		}
+	}
+	for _, p := range today {
 		if (t.Equal(p.Start) || t.After(p.Start)) && t.Before(p.End) {
 			return Status{Open: true, Session: p.Session, Market: m}, nil
 		}
@@ -118,7 +127,7 @@ func NextOpen(unixSec int64, m MarketType) (time.Time, error) {
 			}
 		}
 	}
-	return time.Time{}, nil
+	return time.Time{}, ErrNoOpenFound
 }
 
 // NextClose returns the end of the current open phase, or the end of the next open phase if closed.
@@ -137,5 +146,5 @@ func NextClose(unixSec int64, m MarketType) (time.Time, error) {
 			}
 		}
 	}
-	return time.Time{}, nil
+	return time.Time{}, ErrNoOpenFound
 }

@@ -9,27 +9,33 @@ import (
 // return open with the phase's session, and IsOpen at End should return closed
 // (or open-on-next-phase if phases are contiguous).
 func TestTimelineIsOpenConsistency(t *testing.T) {
-	markets := []MarketType{MarketNASDAQ, MarketHKEX, MarketChinaAShare, MarketTSE, MarketKRX}
-	// Pick a normal trading Monday (2026-03-02) — no holidays any market.
-	dates := []time.Time{
-		time.Date(2026, 3, 2, 0, 0, 0, 0, time.UTC),
+	markets := []struct {
+		m    MarketType
+		date time.Time
+	}{
+		// Use a known non-holiday Monday for each market.
+		// 2026-03-02 is a Korean holiday (Samiljeol observed), so KRX uses 2026-03-09.
+		{MarketNASDAQ, time.Date(2026, 3, 2, 0, 0, 0, 0, time.UTC)},
+		{MarketHKEX, time.Date(2026, 3, 2, 0, 0, 0, 0, time.UTC)},
+		{MarketChinaAShare, time.Date(2026, 3, 2, 0, 0, 0, 0, time.UTC)},
+		{MarketTSE, time.Date(2026, 3, 2, 0, 0, 0, 0, time.UTC)},
+		{MarketKRX, time.Date(2026, 3, 9, 0, 0, 0, 0, time.UTC)},
 	}
-	for _, m := range markets {
-		for _, d := range dates {
-			ds, err := Timeline(d, m)
-			if err != nil {
-				t.Fatalf("%s Timeline: %v", m, err)
+	for _, tc := range markets {
+		m, d := tc.m, tc.date
+		ds, err := Timeline(d, m)
+		if err != nil {
+			t.Fatalf("%s Timeline: %v", m, err)
+		}
+		for i, p := range ds.Phases {
+			st, _ := IsOpen(p.Start.Unix(), m)
+			if !st.Open || st.Session != p.Session {
+				t.Errorf("%s phase[%d] start: got (%v, %v), want (true, %v)", m, i, st.Open, st.Session, p.Session)
 			}
-			for i, p := range ds.Phases {
-				st, _ := IsOpen(p.Start.Unix(), m)
-				if !st.Open || st.Session != p.Session {
-					t.Errorf("%s phase[%d] start: got (%v, %v), want (true, %v)", m, i, st.Open, st.Session, p.Session)
-				}
-				// One nanosecond before End: still in this phase.
-				st, _ = IsOpen(p.End.Add(-time.Nanosecond).Unix(), m)
-				if !st.Open || st.Session != p.Session {
-					t.Errorf("%s phase[%d] end-1ns: got (%v, %v), want (true, %v)", m, i, st.Open, st.Session, p.Session)
-				}
+			// One nanosecond before End: still in this phase.
+			st, _ = IsOpen(p.End.Add(-time.Nanosecond).Unix(), m)
+			if !st.Open || st.Session != p.Session {
+				t.Errorf("%s phase[%d] end-1ns: got (%v, %v), want (true, %v)", m, i, st.Open, st.Session, p.Session)
 			}
 		}
 	}

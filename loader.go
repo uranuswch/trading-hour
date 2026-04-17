@@ -183,6 +183,10 @@ func marketDataDir(m MarketType) string {
 		return "tse"
 	case MarketKRX:
 		return "krx"
+	case MarketFXCMUKOil:
+		return "fxcmukoil"
+	case MarketFXCMUSOil:
+		return "fxcmusoil"
 	default:
 		return strings.ToLower(string(m))
 	}

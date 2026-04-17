@@ -37,6 +37,9 @@ holidays:
 - date: '2026-12-25'
   name: Market holiday
   type: closed
+- date: '2026-12-28'
+  name: Boxing Day (obs.)
+  type: closed
 - date: '2026-12-31'
   name: Market holiday
   type: closed
