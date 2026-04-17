@@ -92,6 +92,42 @@ func Timeline(date time.Time, m MarketType) (DaySchedule, error) {
 	}, nil
 }
 
-// Placeholder stubs so the API surface exists; real implementations come in later tasks.
-func NextOpen(unixSec int64, m MarketType) (time.Time, error)     { panic("not implemented") }
-func NextClose(unixSec int64, m MarketType) (time.Time, error)    { panic("not implemented") }
+const searchHorizonDays = 15
+
+// NextOpen returns the nearest future instant at which IsOpen transitions to true.
+func NextOpen(unixSec int64, m MarketType) (time.Time, error) {
+	mkt, err := lookup(m)
+	if err != nil {
+		return time.Time{}, err
+	}
+	t := time.Unix(unixSec, 0).In(mkt.Location)
+	for i := 0; i < searchHorizonDays; i++ {
+		day := time.Date(t.Year(), t.Month(), t.Day()+i, 0, 0, 0, 0, mkt.Location)
+		phases, _, _, _ := mkt.materialize(day)
+		for _, p := range phases {
+			if p.Start.After(t) {
+				return p.Start, nil
+			}
+		}
+	}
+	return time.Time{}, nil
+}
+
+// NextClose returns the end of the current open phase, or the end of the next open phase if closed.
+func NextClose(unixSec int64, m MarketType) (time.Time, error) {
+	mkt, err := lookup(m)
+	if err != nil {
+		return time.Time{}, err
+	}
+	t := time.Unix(unixSec, 0).In(mkt.Location)
+	for i := -1; i < searchHorizonDays; i++ {
+		day := time.Date(t.Year(), t.Month(), t.Day()+i, 0, 0, 0, 0, mkt.Location)
+		phases, _, _, _ := mkt.materialize(day)
+		for _, p := range phases {
+			if p.End.After(t) {
+				return p.End, nil
+			}
+		}
+	}
+	return time.Time{}, nil
+}
