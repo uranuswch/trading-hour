@@ -1,0 +1,12 @@
+market: TSE
+timezone: Asia/Tokyo
+weekly_schedule:
+  monday: &jp_full
+    - {session: regular, start: "09:00", end: "11:30"}
+    - {session: regular, start: "12:30", end: "15:30"}
+  tuesday: *jp_full
+  wednesday: *jp_full
+  thursday: *jp_full
+  friday: *jp_full
+  saturday: []
+  sunday: []
