@@ -55,8 +55,24 @@ type DaySchedule struct {
 // ErrUnknownMarket is returned for any API call with an unknown MarketType.
 var ErrUnknownMarket = errors.New("tradinghour: unknown market")
 
+// IsOpen reports the market's status at the given absolute instant.
+func IsOpen(unixSec int64, m MarketType) (Status, error) {
+	mkt, err := lookup(m)
+	if err != nil {
+		return Status{}, err
+	}
+	t := time.Unix(unixSec, 0).In(mkt.Location)
+	today, _, _, _ := mkt.materialize(t)
+	yesterday, _, _, _ := mkt.materialize(t.AddDate(0, 0, -1))
+	for _, p := range append(yesterday, today...) {
+		if (t.Equal(p.Start) || t.After(p.Start)) && t.Before(p.End) {
+			return Status{Open: true, Session: p.Session, Market: m}, nil
+		}
+	}
+	return Status{Open: false, Session: SessionClosed, Market: m}, nil
+}
+
 // Placeholder stubs so the API surface exists; real implementations come in later tasks.
-func IsOpen(unixSec int64, m MarketType) (Status, error)          { panic("not implemented") }
 func Timeline(date time.Time, m MarketType) (DaySchedule, error)  { panic("not implemented") }
 func NextOpen(unixSec int64, m MarketType) (time.Time, error)     { panic("not implemented") }
 func NextClose(unixSec int64, m MarketType) (time.Time, error)    { panic("not implemented") }
