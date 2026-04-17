@@ -1,0 +1,12 @@
+market: CME
+timezone: America/New_York
+weekly_schedule:
+  sunday:    [{session: continuous, start: "18:00", end: "00:00+1"}]
+  monday:    &cme_weekday
+    - {session: continuous, start: "00:00", end: "17:00"}
+    - {session: continuous, start: "18:00", end: "00:00+1"}
+  tuesday:   *cme_weekday
+  wednesday: *cme_weekday
+  thursday:  *cme_weekday
+  friday:    [{session: continuous, start: "00:00", end: "17:00"}]
+  saturday:  []
