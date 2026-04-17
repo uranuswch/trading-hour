@@ -1,0 +1,10 @@
+market: FX
+timezone: America/New_York
+weekly_schedule:
+  sunday:    [{session: continuous, start: "17:00", end: "00:00+1"}]
+  monday:    &fx_full [{session: continuous, start: "00:00", end: "00:00+1"}]
+  tuesday:   *fx_full
+  wednesday: *fx_full
+  thursday:  *fx_full
+  friday:    [{session: continuous, start: "00:00", end: "17:00"}]
+  saturday:  []
