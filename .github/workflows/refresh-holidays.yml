@@ -1,0 +1,66 @@
+name: Refresh holiday calendars
+
+on:
+  schedule:
+    - cron: '0 0 15 11 *'  # Nov 15 UTC every year
+  workflow_dispatch:
+    inputs:
+      year:
+        description: "Year to generate (default: next year)"
+        required: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install exchange_calendars pyyaml
+
+      - name: Pick year
+        id: year
+        run: |
+          if [ -n "${{ inputs.year }}" ]; then
+            echo "year=${{ inputs.year }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "year=$(date -u -d '+1 year' +%Y)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate
+        run: python scripts/refresh_holidays.py --year ${{ steps.year.outputs.year }}
+
+      - name: Open PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore: refresh holidays for ${{ steps.year.outputs.year }}"
+          branch: "chore/holidays-${{ steps.year.outputs.year }}"
+          delete-branch: true
+          title: "chore: refresh holidays for ${{ steps.year.outputs.year }}"
+          labels: data, needs-review
+          body: |
+            Automated holiday refresh for **${{ steps.year.outputs.year }}**.
+
+            ### Reviewer checklist
+
+            Cross-check each file against the official exchange calendar:
+            - [ ] NASDAQ — https://www.nyse.com/markets/hours-calendars
+            - [ ] HKEX — https://www.hkex.com.hk/Services/Trading-hours-and-Severe-Weather-Arrangements/Trading-Hours/Holiday-Schedule
+            - [ ] China A-Share — http://www.sse.com.cn/market/
+            - [ ] TSE — https://www.jpx.co.jp/english/corporate/about-jpx/calendar/
+            - [ ] KRX — https://global.krx.co.kr/contents/GLB/05/0501/0501020000/GLB0501020000.jsp
+
+            ### Half-day verification
+
+            Half-days are not reliably extracted from `exchange_calendars`. Please confirm any `type: half_day` entries and add any missing ones manually before merging:
+            - NASDAQ: Day after Thanksgiving, Christmas Eve (usually)
+            - HKEX: Lunar New Year's Eve, Christmas Eve (usually)
+
+            **Do not auto-merge.**
