@@ -1,0 +1,10 @@
+market: Rates
+timezone: America/New_York
+weekly_schedule:
+  monday:    &rates_day [{session: regular, start: "08:00", end: "17:00"}]
+  tuesday:   *rates_day
+  wednesday: *rates_day
+  thursday:  *rates_day
+  friday:    *rates_day
+  saturday:  []
+  sunday:    []
