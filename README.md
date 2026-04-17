@@ -38,6 +38,13 @@ func main() {
 | SSE + SZSE      | `th.MarketChinaAShare`   | Asia/Shanghai       |
 | Tokyo (TSE)     | `th.MarketTSE`           | Asia/Tokyo          |
 | Korea (KRX)     | `th.MarketKRX`           | Asia/Seoul          |
+| Forex           | `th.MarketFX`            | America/New_York    |
+| CME             | `th.MarketCME`           | America/New_York    |
+| ICE             | `th.MarketICE`           | America/New_York    |
+| FXCM UK Oil     | `th.MarketFXCMUKOil`     | UTC                 |
+| FXCM US Oil     | `th.MarketFXCMUSOil`     | UTC                 |
+| Rates           | `th.MarketRates`         | America/New_York    |
+| Metals          | `th.MarketMetals`        | America/New_York    |
 
 NASDAQ includes the Blue Ocean ATS overnight session (8pm–4am ET, Sun–Thu).
 
