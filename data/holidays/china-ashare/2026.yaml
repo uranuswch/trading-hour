@@ -1,0 +1,23 @@
+market: ChinaAShare
+year: 2026
+holidays:
+  - {date: "2026-01-01", name: "New Year's Day",            type: closed}
+  - {date: "2026-02-16", name: "Spring Festival Eve",       type: closed}
+  - {date: "2026-02-17", name: "Spring Festival",           type: closed}
+  - {date: "2026-02-18", name: "Spring Festival",           type: closed}
+  - {date: "2026-02-19", name: "Spring Festival",           type: closed}
+  - {date: "2026-02-20", name: "Spring Festival",           type: closed}
+  - {date: "2026-02-23", name: "Spring Festival (obs.)",    type: closed}
+  - {date: "2026-02-24", name: "Spring Festival (obs.)",    type: closed}
+  - {date: "2026-04-06", name: "Qingming Festival (obs.)",  type: closed}
+  - {date: "2026-05-01", name: "Labour Day",                type: closed}
+  - {date: "2026-05-04", name: "Labour Day (obs.)",         type: closed}
+  - {date: "2026-05-05", name: "Labour Day (obs.)",         type: closed}
+  - {date: "2026-06-19", name: "Dragon Boat Festival",      type: closed}
+  - {date: "2026-09-25", name: "Mid-Autumn (obs.)",         type: closed}
+  - {date: "2026-10-01", name: "National Day",              type: closed}
+  - {date: "2026-10-02", name: "National Day",              type: closed}
+  - {date: "2026-10-05", name: "National Day Break",        type: closed}
+  - {date: "2026-10-06", name: "National Day Break",        type: closed}
+  - {date: "2026-10-07", name: "National Day Break",        type: closed}
+  - {date: "2026-10-08", name: "National Day Break",        type: closed}

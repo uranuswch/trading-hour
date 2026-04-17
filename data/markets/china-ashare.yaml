@@ -1,0 +1,12 @@
+market: ChinaAShare
+timezone: Asia/Shanghai
+weekly_schedule:
+  monday: &cn_full
+    - {session: regular, start: "09:30", end: "11:30"}
+    - {session: regular, start: "13:00", end: "15:00"}
+  tuesday: *cn_full
+  wednesday: *cn_full
+  thursday: *cn_full
+  friday: *cn_full
+  saturday: []
+  sunday: []
