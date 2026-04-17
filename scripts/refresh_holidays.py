@@ -26,6 +26,9 @@ MARKETS = {
     "ICE":         ("XICE", "ice"),
     "Rates":       ("XNYS", "rates"),
     "Metals":      ("CME", "metals"),
+    "FX":          ("FX", "fx"),
+    "FXCMUKOil":   ("FX", "fxcmukoil"),
+    "FXCMUSOil":   ("FX", "fxcmusoil"),
 }
 
 # Known half-day markets and their fallback "early close" detection.

@@ -8,3 +8,5 @@ weekly_schedule:
   friday:    *rates_day
   saturday:  []
   sunday:    []
+half_day_schedule:
+  - {session: regular, start: "08:00", end: "13:00"}

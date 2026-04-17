@@ -75,13 +75,13 @@ func IsOpen(unixSec int64, m MarketType) (Status, error) {
 	}
 	t := time.Unix(unixSec, 0).In(mkt.Location)
 	today, _, _, _ := mkt.materialize(t)
-	yesterday, _, _, _ := mkt.materialize(t.AddDate(0, 0, -1))
-	for _, p := range yesterday {
+	for _, p := range today {
 		if (t.Equal(p.Start) || t.After(p.Start)) && t.Before(p.End) {
 			return Status{Open: true, Session: p.Session, Market: m}, nil
 		}
 	}
-	for _, p := range today {
+	yesterday, _, _, _ := mkt.materialize(t.AddDate(0, 0, -1))
+	for _, p := range yesterday {
 		if (t.Equal(p.Start) || t.After(p.Start)) && t.Before(p.End) {
 			return Status{Open: true, Session: p.Session, Market: m}, nil
 		}

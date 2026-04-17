@@ -157,6 +157,9 @@ func loadHolidayFile(mkt *Market, p string) error {
 		return fmt.Errorf("tradinghour: %s: market mismatch (%q vs %q)", p, hf.Market, mkt.Type)
 	}
 	for _, h := range hf.Holidays {
+		if HolidayType(h.Type) == HolidayHalfDay && len(mkt.HalfDayPhases) == 0 {
+			return fmt.Errorf("tradinghour: %s: half_day holiday %q configured but market %q has no half_day_schedule", p, h.Date, mkt.Type)
+		}
 		t, err := time.Parse("2006-01-02", h.Date)
 		if err != nil {
 			return fmt.Errorf("tradinghour: %s: bad date %q: %w", p, h.Date, err)
@@ -179,14 +182,8 @@ func marketDataDir(m MarketType) string {
 		return "hkex"
 	case MarketChinaAShare:
 		return "china-ashare"
-	case MarketTSE:
-		return "tse"
 	case MarketKRX:
 		return "krx"
-	case MarketFXCMUKOil:
-		return "fxcmukoil"
-	case MarketFXCMUSOil:
-		return "fxcmusoil"
 	default:
 		return strings.ToLower(string(m))
 	}
