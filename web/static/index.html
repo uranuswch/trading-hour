@@ -1,6 +1,29 @@
-<!-- web/static/index.html -->
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><title>Trading Hours</title></head>
-<body><h1>Trading Hours</h1></body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trading Hours</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <main>
+    <header id="hero">
+      <div class="hero-label">GLOBAL TRADING HOURS</div>
+      <h1 id="hero-count">— Markets Open</h1>
+      <p class="hero-sub">of 12 tracked · refreshes every 30s</p>
+    </header>
+    <div class="separator"></div>
+    <section id="pills" class="pills-grid"></section>
+    <div id="spotlight" class="spotlight hidden"></div>
+  </main>
+
+  <div id="overlay" class="overlay hidden" onclick="closeDrawer()"></div>
+  <aside id="drawer" class="drawer">
+    <button class="drawer-close" onclick="closeDrawer()">×</button>
+    <div id="drawer-content"></div>
+  </aside>
+
+  <script src="/app.js"></script>
+</body>
 </html>
