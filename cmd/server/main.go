@@ -9,6 +9,7 @@ import (
 
 func main() {
 	mux := http.NewServeMux()
+	// web/static is resolved relative to cwd; run from the repo root: go run ./cmd/server/
 	mux.Handle("/", http.FileServer(http.Dir("web/static")))
 
 	port := os.Getenv("PORT")
