@@ -35,7 +35,11 @@ func handleStatus(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().Unix()
 	items := make([]statusItem, 0, len(allMarkets))
 	for _, m := range allMarkets {
-		s, _ := th.IsOpen(now, m)
+		s, err := th.IsOpen(now, m)
+		if err != nil {
+			http.Error(w, "internal error", http.StatusInternalServerError)
+			return
+		}
 		items = append(items, statusItem{
 			Market:  string(m),
 			Open:    s.Open,
