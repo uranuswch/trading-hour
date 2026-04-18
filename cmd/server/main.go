@@ -48,6 +48,12 @@ type timelineResponse struct {
 	Phases      []phaseItem `json:"phases"`
 }
 
+type nextOpenResponse struct {
+	Market string `json:"market"`
+	Time   string `json:"time"`
+	Local  string `json:"local"`
+}
+
 func handleStatus(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().Unix()
 	items := make([]statusItem, 0, len(allMarkets))
@@ -120,10 +126,33 @@ func handleTimeline(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(resp)
 }
 
+func handleNextOpen(w http.ResponseWriter, r *http.Request) {
+	market := th.MarketType(r.PathValue("market"))
+
+	t, err := th.NextOpen(time.Now().Unix(), market)
+	if err != nil {
+		if errors.Is(err, th.ErrUnknownMarket) {
+			http.Error(w, "unknown market", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	resp := nextOpenResponse{
+		Market: string(market),
+		Time:   t.UTC().Format(time.RFC3339),
+		Local:  t.Format("15:04 MST"),
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
+}
+
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/status", handleStatus)
 	mux.HandleFunc("GET /api/timeline/{market}", handleTimeline)
+	mux.HandleFunc("GET /api/nextopen/{market}", handleNextOpen)
 	// web/static is resolved relative to cwd; run from the repo root: go run ./cmd/server/
 	mux.Handle("/", http.FileServer(http.Dir("web/static")))
 

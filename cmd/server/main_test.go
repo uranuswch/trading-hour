@@ -101,3 +101,37 @@ func TestHandleStatus_returnsAllMarkets(t *testing.T) {
 		}
 	}
 }
+
+func TestHandleNextOpen_returnsTime(t *testing.T) {
+	req := httptest.NewRequest("GET", "/api/nextopen/HKEX", nil)
+	req.SetPathValue("market", "HKEX")
+	w := httptest.NewRecorder()
+	handleNextOpen(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body)
+	}
+	var resp nextOpenResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.Market != "HKEX" {
+		t.Errorf("expected HKEX, got %s", resp.Market)
+	}
+	if resp.Time == "" {
+		t.Error("empty time field")
+	}
+	if resp.Local == "" {
+		t.Error("empty local field")
+	}
+}
+
+func TestHandleNextOpen_unknownMarket(t *testing.T) {
+	req := httptest.NewRequest("GET", "/api/nextopen/UNKNOWN", nil)
+	req.SetPathValue("market", "UNKNOWN")
+	w := httptest.NewRecorder()
+	handleNextOpen(w, req)
+	if w.Code != http.StatusNotFound {
+		t.Fatalf("expected 404, got %d", w.Code)
+	}
+}
