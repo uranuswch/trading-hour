@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -31,6 +32,22 @@ type statusItem struct {
 	Session string `json:"session"`
 }
 
+type phaseItem struct {
+	Session string `json:"session"`
+	Start   string `json:"start"`
+	End     string `json:"end"`
+}
+
+type timelineResponse struct {
+	Market      string      `json:"market"`
+	Date        string      `json:"date"`
+	Timezone    string      `json:"timezone"`
+	IsHoliday   bool        `json:"isHoliday"`
+	IsHalfDay   bool        `json:"isHalfDay"`
+	HolidayName string      `json:"holidayName"`
+	Phases      []phaseItem `json:"phases"`
+}
+
 func handleStatus(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().Unix()
 	items := make([]statusItem, 0, len(allMarkets))
@@ -50,9 +67,56 @@ func handleStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(items)
 }
 
+func handleTimeline(w http.ResponseWriter, r *http.Request) {
+	market := th.MarketType(r.PathValue("market"))
+
+	date := time.Now()
+	if ds := r.URL.Query().Get("date"); ds != "" {
+		parsed, err := time.Parse("2006-01-02", ds)
+		if err != nil {
+			http.Error(w, "invalid date: use YYYY-MM-DD", http.StatusBadRequest)
+			return
+		}
+		date = parsed
+	}
+
+	sched, err := th.Timeline(date, market)
+	if err != nil {
+		if errors.Is(err, th.ErrUnknownMarket) {
+			http.Error(w, "unknown market", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	phases := make([]phaseItem, len(sched.Phases))
+	for i, p := range sched.Phases {
+		phases[i] = phaseItem{
+			Session: string(p.Session),
+			Start:   p.Start.Format(time.RFC3339),
+			End:     p.End.Format(time.RFC3339),
+		}
+	}
+
+	resp := timelineResponse{
+		Market:      string(sched.Market),
+		Date:        sched.Date.Format("2006-01-02"),
+		Timezone:    sched.Date.Location().String(),
+		IsHoliday:   sched.IsHoliday,
+		IsHalfDay:   sched.IsHalfDay,
+		HolidayName: sched.HolidayName,
+		Phases:      phases,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
+}
+
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/status", handleStatus)
+	mux.HandleFunc("GET /api/timeline/{market}", handleTimeline)
 	// web/static is resolved relative to cwd; run from the repo root: go run ./cmd/server/
 	mux.Handle("/", http.FileServer(http.Dir("web/static")))
 

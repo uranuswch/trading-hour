@@ -8,6 +8,68 @@ import (
 	"testing"
 )
 
+func TestHandleTimeline_today(t *testing.T) {
+	req := httptest.NewRequest("GET", "/api/timeline/NASDAQ", nil)
+	req.SetPathValue("market", "NASDAQ")
+	w := httptest.NewRecorder()
+	handleTimeline(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body)
+	}
+	var resp timelineResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.Market != "NASDAQ" {
+		t.Errorf("expected NASDAQ, got %s", resp.Market)
+	}
+	if resp.Timezone != "America/New_York" {
+		t.Errorf("unexpected timezone %s", resp.Timezone)
+	}
+	if resp.Date == "" {
+		t.Error("empty date")
+	}
+}
+
+func TestHandleTimeline_withDate(t *testing.T) {
+	req := httptest.NewRequest("GET", "/api/timeline/HKEX?date=2026-04-19", nil)
+	req.SetPathValue("market", "HKEX")
+	w := httptest.NewRecorder()
+	handleTimeline(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body)
+	}
+	var resp timelineResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.Date != "2026-04-19" {
+		t.Errorf("expected 2026-04-19, got %s", resp.Date)
+	}
+}
+
+func TestHandleTimeline_unknownMarket(t *testing.T) {
+	req := httptest.NewRequest("GET", "/api/timeline/UNKNOWN", nil)
+	req.SetPathValue("market", "UNKNOWN")
+	w := httptest.NewRecorder()
+	handleTimeline(w, req)
+	if w.Code != http.StatusNotFound {
+		t.Fatalf("expected 404, got %d", w.Code)
+	}
+}
+
+func TestHandleTimeline_invalidDate(t *testing.T) {
+	req := httptest.NewRequest("GET", "/api/timeline/NASDAQ?date=not-a-date", nil)
+	req.SetPathValue("market", "NASDAQ")
+	w := httptest.NewRecorder()
+	handleTimeline(w, req)
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d", w.Code)
+	}
+}
+
 func TestHandleStatus_returnsAllMarkets(t *testing.T) {
 	req := httptest.NewRequest("GET", "/api/status", nil)
 	w := httptest.NewRecorder()
