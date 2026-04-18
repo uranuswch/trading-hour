@@ -70,7 +70,7 @@ func handleStatus(w http.ResponseWriter, r *http.Request) {
 func handleTimeline(w http.ResponseWriter, r *http.Request) {
 	market := th.MarketType(r.PathValue("market"))
 
-	date := time.Now()
+	var date time.Time
 	if ds := r.URL.Query().Get("date"); ds != "" {
 		parsed, err := time.Parse("2006-01-02", ds)
 		if err != nil {
@@ -78,6 +78,13 @@ func handleTimeline(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		date = parsed
+	} else {
+		loc, err := th.MarketLocation(market)
+		if err == nil {
+			date = time.Now().In(loc)
+		} else {
+			date = time.Now() // unknown market — Timeline will return ErrUnknownMarket below
+		}
 	}
 
 	sched, err := th.Timeline(date, market)

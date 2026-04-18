@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 func TestHandleTimeline_today(t *testing.T) {
@@ -27,8 +28,13 @@ func TestHandleTimeline_today(t *testing.T) {
 	if resp.Timezone != "America/New_York" {
 		t.Errorf("unexpected timezone %s", resp.Timezone)
 	}
-	if resp.Date == "" {
-		t.Error("empty date")
+	nyLoc, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		t.Fatal(err)
+	}
+	wantDate := time.Now().In(nyLoc).Format("2006-01-02")
+	if resp.Date != wantDate {
+		t.Errorf("expected date %s, got %s", wantDate, resp.Date)
 	}
 }
 

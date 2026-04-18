@@ -148,3 +148,12 @@ func NextClose(unixSec int64, m MarketType) (time.Time, error) {
 	}
 	return time.Time{}, ErrNoOpenFound
 }
+
+// MarketLocation returns the *time.Location for the given market.
+func MarketLocation(m MarketType) (*time.Location, error) {
+	mkt, err := lookup(m)
+	if err != nil {
+		return nil, err
+	}
+	return mkt.Location, nil
+}
