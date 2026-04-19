@@ -13,6 +13,9 @@
 .vscode/
 *.swp
 
+# Superpowers plugin working data
+.superpowers/
+
 # Local env
 .env
 
