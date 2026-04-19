@@ -89,12 +89,11 @@ function buildTimelineBar(phases, tz, showCursor) {
   let segs = '';
   for (const p of phases) {
     const s = marketHourMin(p.start, tz);
-    const e = marketHourMin(p.end, tz);
     const startM = s.h * 60 + s.m;
-    let endM = e.h * 60 + e.m;
-    if (endM <= startM) endM = TOTAL;         // overnight wraps past midnight
-    const left = (startM / TOTAL * 100).toFixed(2);
-    const width = ((endM - startM) / TOTAL * 100).toFixed(2);
+    const durationMs = new Date(p.end).getTime() - new Date(p.start).getTime();
+    const durationM  = Math.min(durationMs / 60_000, TOTAL - startM); // cap at bar end
+    const left  = (startM / TOTAL * 100).toFixed(2);
+    const width = (durationM / TOTAL * 100).toFixed(2);
     segs += `<div class="tl-seg ${p.session}" style="left:${left}%;width:${width}%;"></div>`;
   }
 
@@ -185,6 +184,7 @@ function openDrawer(market) {
     '<p style="color:var(--muted);font-size:13px;padding-top:8px;">Loading…</p>';
 
   fetchTimeline(market).then(sched => {
+    if (activeMarket !== market) return; // drawer was closed before response arrived
     marketToday = sched.date;
     renderDrawerContent(sched);
   }).catch(console.error);

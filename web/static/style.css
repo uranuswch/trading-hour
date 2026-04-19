@@ -178,7 +178,6 @@ body {
 .drawer-tz { font-size: 11px; color: var(--muted); margin-bottom: 24px; }
 
 /* Date picker */
-.drawer-date-label { font-size: 9px; letter-spacing: 2px; color: var(--muted); margin-bottom: 7px; }
 .drawer-date-input {
   display: block;
   width: 100%;
