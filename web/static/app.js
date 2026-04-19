@@ -226,14 +226,24 @@ async function refreshSpotlight(statuses) {
   renderSpotlight(soonest);
 }
 
-// ── Init ──────────────────────────────────────────────────────
-async function init() {
-  const statuses = await fetchStatus();
-  renderPills(statuses);
-  await refreshSpotlight(statuses);
+// ── Refresh loop ───────────────────────────────────────────────
+
+async function refresh() {
+  try {
+    const statuses = await fetchStatus();
+    renderPills(statuses);
+    await refreshSpotlight(statuses);
+
+    // If drawer is open and showing today, refresh it too
+    if (activeMarket && marketToday) {
+      const sched = await fetchTimeline(activeMarket);
+      if (sched.date === marketToday) renderDrawerContent(sched);
+    }
+  } catch (err) {
+    console.error('refresh error:', err);
+  }
 }
 
-init().catch(err => {
-  console.error(err);
-  document.getElementById('hero-count').textContent = 'Unable to load';
-});
+// ── Init ──────────────────────────────────────────────────────
+refresh();
+setInterval(refresh, 30_000);
