@@ -64,9 +64,139 @@ function renderPills(statuses) {
   document.getElementById('hero-count').textContent = `${openCount} Markets Open`;
 }
 
-// ── Drawer (stub — will be replaced in Task 9) ─────────────────
-function openDrawer(market) { console.log('openDrawer', market); }
-function closeDrawer() {}
+// ── Timezone helpers ───────────────────────────────────────────
+
+function marketHourMin(isoStr, tz) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz, hour: 'numeric', minute: 'numeric', hour12: false,
+  }).formatToParts(new Date(isoStr));
+  return {
+    h: parseInt(parts.find(p => p.type === 'hour').value, 10),
+    m: parseInt(parts.find(p => p.type === 'minute').value, 10),
+  };
+}
+
+function fmtMarketTime(isoStr, tz) {
+  return new Date(isoStr).toLocaleTimeString('en-US', {
+    timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false,
+  });
+}
+
+// ── Timeline bar ───────────────────────────────────────────────
+
+function buildTimelineBar(phases, tz, showCursor) {
+  const TOTAL = 24 * 60;
+  let segs = '';
+  for (const p of phases) {
+    const s = marketHourMin(p.start, tz);
+    const e = marketHourMin(p.end, tz);
+    const startM = s.h * 60 + s.m;
+    let endM = e.h * 60 + e.m;
+    if (endM <= startM) endM = TOTAL;         // overnight wraps past midnight
+    const left = (startM / TOTAL * 100).toFixed(2);
+    const width = ((endM - startM) / TOTAL * 100).toFixed(2);
+    segs += `<div class="tl-seg ${p.session}" style="left:${left}%;width:${width}%;"></div>`;
+  }
+
+  let cursor = '';
+  if (showCursor) {
+    const { h, m } = marketHourMin(new Date().toISOString(), tz);
+    const pct = ((h * 60 + m) / TOTAL * 100).toFixed(2);
+    cursor = `<div class="tl-cursor" style="left:${pct}%;"></div>`;
+  }
+
+  return `
+    <div class="timeline-bar">${segs}${cursor}</div>
+    <div class="timeline-labels">
+      <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span>
+    </div>`;
+}
+
+// ── Session rows ───────────────────────────────────────────────
+
+function buildSessionRows(phases, tz, showActive) {
+  if (!phases.length) return '<p class="no-sessions">No sessions today</p>';
+  const nowMs = Date.now();
+  return phases.map(p => {
+    const active = showActive &&
+      new Date(p.start).getTime() <= nowMs && nowMs < new Date(p.end).getTime();
+    const name = p.session.charAt(0).toUpperCase() + p.session.slice(1);
+    const start = fmtMarketTime(p.start, tz);
+    const end   = fmtMarketTime(p.end,   tz);
+    return `
+      <div class="session-row${active ? ' active' : ''}">
+        <span class="session-name">${active ? '● ' : ''}${name}</span>
+        <span class="session-time">${start} – ${end}</span>
+      </div>`;
+  }).join('');
+}
+
+// ── Drawer ─────────────────────────────────────────────────────
+
+let activeMarket = null;
+let marketToday  = null; // YYYY-MM-DD in market's local tz, set when drawer first opens
+
+function drawerBadge(sched) {
+  if (sched.isHoliday) return { cls: 'holiday', text: `Holiday — ${sched.holidayName}` };
+  if (sched.isHalfDay) return { cls: 'partial', text: `Half Day — ${sched.holidayName}` };
+  const nowMs = Date.now();
+  for (const p of sched.phases || []) {
+    if (new Date(p.start).getTime() <= nowMs && nowMs < new Date(p.end).getTime()) {
+      const cls = pillClass(p.session);
+      const dot = pillDot(cls);
+      return { cls, text: `${dot} ${p.session.toUpperCase()}` };
+    }
+  }
+  return { cls: 'closed', text: '○ CLOSED' };
+}
+
+function renderDrawerContent(sched) {
+  const tz = sched.timezone;
+  const isToday = sched.date === marketToday;
+  const { cls, text } = drawerBadge(sched);
+
+  document.getElementById('drawer-content').innerHTML = `
+    <div class="drawer-mkt-name">${MARKET_LABELS[sched.market] || sched.market}</div>
+    <span class="drawer-badge ${cls}">${text}</span>
+    <div class="drawer-tz">${tz}</div>
+    <div class="drawer-section-label">DATE</div>
+    <input class="drawer-date-input" type="date" id="date-picker" value="${sched.date}" />
+    <div class="drawer-section-label">TIMELINE</div>
+    ${buildTimelineBar(sched.phases || [], tz, isToday)}
+    <div class="drawer-section-label">SESSIONS</div>
+    <div class="session-list">${buildSessionRows(sched.phases || [], tz, isToday)}</div>
+  `;
+
+  document.getElementById('date-picker').addEventListener('change', async e => {
+    const val = e.target.value;
+    if (!val) return;
+    try {
+      const s = await fetchTimeline(activeMarket, val);
+      renderDrawerContent(s);
+    } catch (err) { console.error(err); }
+  });
+}
+
+function openDrawer(market) {
+  activeMarket = market;
+  document.getElementById('overlay').classList.remove('hidden');
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-content').innerHTML =
+    '<p style="color:var(--muted);font-size:13px;padding-top:8px;">Loading…</p>';
+
+  fetchTimeline(market).then(sched => {
+    marketToday = sched.date;
+    renderDrawerContent(sched);
+  }).catch(console.error);
+}
+
+function closeDrawer() {
+  activeMarket = null;
+  marketToday  = null;
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-content').innerHTML = '';
+}
 
 function renderSpotlight(data) {
   const el = document.getElementById('spotlight');
