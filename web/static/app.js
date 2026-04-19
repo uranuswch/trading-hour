@@ -228,19 +228,33 @@ async function refreshSpotlight(statuses) {
 
 // ── Refresh loop ───────────────────────────────────────────────
 
+let initialised = false;
+
 async function refresh() {
   try {
     const statuses = await fetchStatus();
     renderPills(statuses);
     await refreshSpotlight(statuses);
+    initialised = true;
 
     // If drawer is open and showing today, refresh it too
     if (activeMarket && marketToday) {
-      const sched = await fetchTimeline(activeMarket);
-      if (sched.date === marketToday) renderDrawerContent(sched);
+      const picker = document.getElementById('date-picker');
+      const displayedDate = picker ? picker.value : null;
+      if (displayedDate !== marketToday) return; // user navigated to a non-today date
+      const marketAtLaunch = activeMarket;
+      const todayAtLaunch  = marketToday;
+      const sched = await fetchTimeline(marketAtLaunch);
+      // Re-check: market or date may have changed while fetch was in-flight
+      if (activeMarket === marketAtLaunch && sched.date === todayAtLaunch) {
+        renderDrawerContent(sched);
+      }
     }
   } catch (err) {
     console.error('refresh error:', err);
+    if (!initialised) {
+      document.getElementById('hero-count').textContent = 'Unable to load';
+    }
   }
 }
 
