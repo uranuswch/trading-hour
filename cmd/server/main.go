@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 	"time"
 
 	th "github.com/uranuswch/trading-hour"
+	webpkg "github.com/uranuswch/trading-hour/web"
 )
 
 var allMarkets = []th.MarketType{
@@ -153,8 +155,14 @@ func main() {
 	mux.HandleFunc("GET /api/status", handleStatus)
 	mux.HandleFunc("GET /api/timeline/{market}", handleTimeline)
 	mux.HandleFunc("GET /api/nextopen/{market}", handleNextOpen)
-	// web/static is resolved relative to cwd; run from the repo root: go run ./cmd/server/
-	mux.Handle("/", http.FileServer(http.Dir("web/static")))
+
+	// Serve embedded dashboard files — binary is self-contained, no cwd dependency.
+	staticFS, err := fs.Sub(webpkg.Static, "static")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "failed to prepare static FS:", err)
+		os.Exit(1)
+	}
+	mux.Handle("/", http.FileServer(http.FS(staticFS)))
 
 	port := os.Getenv("PORT")
 	if port == "" {

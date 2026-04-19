@@ -1,6 +1,17 @@
 // web/static/app.js
 'use strict';
 
+// ── HTML helpers ───────────────────────────────────────────────
+
+/** Escape a string for safe use inside innerHTML. */
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 const MARKET_LABELS = {
   NASDAQ: 'NASDAQ', HKEX: 'HKEX', ChinaAShare: 'SSE/SZSE', TSE: 'TSE',
   KRX: 'KRX', FX: 'FX', CME: 'CME', ICE: 'ICE',
@@ -136,8 +147,8 @@ let activeMarket = null;
 let marketToday  = null; // YYYY-MM-DD in market's local tz, set when drawer first opens
 
 function drawerBadge(sched) {
-  if (sched.isHoliday) return { cls: 'holiday', text: `Holiday — ${sched.holidayName}` };
-  if (sched.isHalfDay) return { cls: 'partial', text: `Half Day — ${sched.holidayName}` };
+  if (sched.isHoliday) return { cls: 'holiday', text: `Holiday — ${esc(sched.holidayName)}` };
+  if (sched.isHalfDay) return { cls: 'partial', text: `Half Day — ${esc(sched.holidayName)}` };
   const nowMs = Date.now();
   for (const p of sched.phases || []) {
     if (new Date(p.start).getTime() <= nowMs && nowMs < new Date(p.end).getTime()) {
@@ -155,7 +166,7 @@ function renderDrawerContent(sched) {
   const { cls, text } = drawerBadge(sched);
 
   document.getElementById('drawer-content').innerHTML = `
-    <div class="drawer-mkt-name">${MARKET_LABELS[sched.market] || sched.market}</div>
+    <div class="drawer-mkt-name">${MARKET_LABELS[sched.market] || esc(sched.market)}</div>
     <span class="drawer-badge ${cls}">${text}</span>
     <div class="drawer-tz">${tz}</div>
     <div class="drawer-section-label">DATE</div>
