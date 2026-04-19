@@ -48,6 +48,31 @@ func main() {
 
 NASDAQ includes the Blue Ocean ATS overnight session (8pm–4am ET, Sun–Thu).
 
+## Web Dashboard
+
+A live market-status dashboard is included in `web/static/` and served by a small Go HTTP server in `cmd/server/`.
+
+**Run:**
+
+```bash
+go run ./cmd/server/
+# → listening on http://localhost:8080
+```
+
+Set `PORT` to override the default port:
+
+```bash
+PORT=9000 go run ./cmd/server/
+```
+
+The dashboard auto-refreshes every 30 seconds and shows:
+
+- **Pills** — open/partial/closed status for all 12 markets at a glance
+- **Spotlight** — countdown to the next market open
+- **Side drawer** — 24-hour timeline bar, session list, and date picker for any market
+
+The server binary embeds `web/static/` via `go:embed`, so it has no working-directory dependency and can be deployed as a single self-contained binary.
+
 ## Data
 
 Market schedules and holiday calendars live in `data/` as YAML and are embedded into the binary via `go:embed`. A GitHub Action runs yearly (November 15) to open a PR generating next-year holidays from [`exchange_calendars`](https://pypi.org/project/exchange-calendars/). PRs require human review before merge.
