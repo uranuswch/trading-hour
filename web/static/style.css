@@ -17,6 +17,13 @@
   --amber-border: rgba(217, 119, 6, 0.28);
   --muted: #6b6040;
   --drawer-w: 360px;
+  --bg-drawer: #100e08;
+  --timeline-bg: #1a1500;
+  --overnight-bg: #3b2a00;
+  --cursor-color: #fff;
+  --neutral-bg: rgba(120, 120, 120, 0.08);
+  --neutral-border: rgba(120, 120, 120, 0.2);
+  --neutral-text: #888;
 }
 
 html, body { min-height: 100%; }
@@ -124,7 +131,7 @@ body {
   position: fixed;
   top: 0; right: 0; bottom: 0;
   width: var(--drawer-w);
-  background: linear-gradient(160deg, #100e08 0%, #0c0c0e 100%);
+  background: linear-gradient(160deg, var(--bg-drawer) 0%, var(--bg) 100%);
   border-left: 1px solid var(--gold-border);
   z-index: 20;
   padding: 32px 26px 40px;
@@ -166,7 +173,7 @@ body {
 .drawer-badge.open    { background: rgba(245,158,11,0.14); color: var(--gold-light); border: 1px solid var(--gold-border); }
 .drawer-badge.closed  { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
 .drawer-badge.partial { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
-.drawer-badge.holiday { background: rgba(120,120,120,0.08); color: #888; border: 1px solid rgba(120,120,120,0.2); }
+.drawer-badge.holiday { background: var(--neutral-bg); color: var(--neutral-text); border: 1px solid var(--neutral-border); }
 
 .drawer-tz { font-size: 11px; color: var(--muted); margin-bottom: 24px; }
 
@@ -193,7 +200,7 @@ body {
   position: relative;
   height: 10px;
   border-radius: 5px;
-  background: #1a1500;
+  background: var(--timeline-bg);
   overflow: hidden;
   margin-bottom: 5px;
 }
@@ -203,13 +210,13 @@ body {
 }
 .tl-seg.regular, .tl-seg.continuous { background: var(--gold); }
 .tl-seg.premarket, .tl-seg.postmarket { background: var(--amber); opacity: 0.55; }
-.tl-seg.overnight { background: #3b2a00; }
+.tl-seg.overnight { background: var(--overnight-bg); }
 
 .tl-cursor {
   position: absolute;
   top: -2px; bottom: -2px;
   width: 2px;
-  background: #fff;
+  background: var(--cursor-color);
   border-radius: 1px;
   box-shadow: 0 0 5px rgba(255,255,255,0.5);
   overflow: visible;

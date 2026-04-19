@@ -25,7 +25,7 @@ async function fetchTimeline(market, date) {
 async function fetchNextOpen(market) {
   const r = await fetch(`/api/nextopen/${market}`);
   if (!r.ok) return null;
-  return r.json();
+  try { return await r.json(); } catch { return null; }
 }
 
 // ── Pill helpers ───────────────────────────────────────────────
@@ -56,7 +56,7 @@ function renderPills(statuses) {
     const btn = document.createElement('button');
     btn.className = `pill ${cls}`;
     btn.dataset.market = s.market;
-    btn.innerHTML = `<span>${pillDot(cls)}</span>${label}`;
+    btn.innerHTML = `<span aria-hidden="true">${pillDot(cls)}</span>${label}`;
     btn.addEventListener('click', () => openDrawer(s.market));
     container.appendChild(btn);
   }
@@ -103,4 +103,7 @@ async function init() {
   await refreshSpotlight(statuses);
 }
 
-init().catch(console.error);
+init().catch(err => {
+  console.error(err);
+  document.getElementById('hero-count').textContent = 'Unable to load';
+});

@@ -8,11 +8,11 @@
 </head>
 <body>
   <main>
-    <header id="hero">
+    <div id="hero" class="hero">
       <div class="hero-label">GLOBAL TRADING HOURS</div>
       <h1 id="hero-count">— Markets Open</h1>
       <p class="hero-sub">of 12 tracked · refreshes every 30s</p>
-    </header>
+    </div>
     <div class="separator"></div>
     <section id="pills" class="pills-grid"></section>
     <div id="spotlight" class="spotlight hidden"></div>
@@ -24,6 +24,11 @@
     <div id="drawer-content"></div>
   </aside>
 
+  <script>
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeDrawer();
+    });
+  </script>
   <script src="/app.js"></script>
 </body>
 </html>
