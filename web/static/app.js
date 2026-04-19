@@ -68,5 +68,39 @@ function renderPills(statuses) {
 function openDrawer(market) { console.log('openDrawer', market); }
 function closeDrawer() {}
 
+function renderSpotlight(data) {
+  const el = document.getElementById('spotlight');
+  if (!data) { el.classList.add('hidden'); return; }
+
+  const diffMs = new Date(data.time).getTime() - Date.now();
+  if (diffMs <= 0) { el.classList.add('hidden'); return; }
+  const h = Math.floor(diffMs / 3_600_000);
+  const m = Math.floor((diffMs % 3_600_000) / 60_000);
+  const countdown = h > 0 ? `in ${h}h ${m}m` : `in ${m}m`;
+
+  el.classList.remove('hidden');
+  el.innerHTML = `
+    <div class="spotlight-label">NEXT OPEN</div>
+    <div class="spotlight-market">${MARKET_LABELS[data.market] || data.market}</div>
+    <div class="spotlight-time">${countdown} · ${data.local}</div>
+  `;
+}
+
+async function refreshSpotlight(statuses) {
+  const closed = statuses.filter(s => pillClass(s.session) === 'closed');
+  if (!closed.length) { renderSpotlight(null); return; }
+  const results = await Promise.all(closed.map(s => fetchNextOpen(s.market)));
+  const valid = results.filter(Boolean);
+  if (!valid.length) { renderSpotlight(null); return; }
+  const soonest = valid.reduce((a, b) => (a.time < b.time ? a : b));
+  renderSpotlight(soonest);
+}
+
 // ── Init ──────────────────────────────────────────────────────
-fetchStatus().then(renderPills).catch(console.error);
+async function init() {
+  const statuses = await fetchStatus();
+  renderPills(statuses);
+  await refreshSpotlight(statuses);
+}
+
+init().catch(console.error);
