@@ -60,3 +60,37 @@ func TestIsOpenUnknownMarket(t *testing.T) {
 		t.Errorf("err = %v", err)
 	}
 }
+
+// NASDAQ BOAT overnight is anchored to the next trading day: it should run on
+// a closed-holiday evening when the next day is normal, and it should NOT run
+// on a normal evening when the next day is a closed holiday.
+// Memorial Day 2026 (Mon 5/25) is the canonical case — closed-holiday on a
+// weekday that has an overnight phase in the weekly schedule.
+func TestIsOpenNASDAQHolidayOvernight(t *testing.T) {
+	ny := mustNY(t)
+	cases := []struct {
+		name     string
+		local    time.Time
+		wantOpen bool
+		wantSess Session
+	}{
+		{"Mon Memorial Day 10:00 still closed (day session)", time.Date(2026, 5, 25, 10, 0, 0, 0, ny), false, SessionClosed},
+		{"Mon Memorial Day 19:59 just before overnight", time.Date(2026, 5, 25, 19, 59, 0, 0, ny), false, SessionClosed},
+		{"Mon Memorial Day 20:00 overnight start", time.Date(2026, 5, 25, 20, 0, 0, 0, ny), true, SessionOvernight},
+		{"Mon Memorial Day 23:30 overnight", time.Date(2026, 5, 25, 23, 30, 0, 0, ny), true, SessionOvernight},
+		{"Tue post-Memorial-Day 02:00 overnight spillover", time.Date(2026, 5, 26, 2, 0, 0, 0, ny), true, SessionOvernight},
+		{"Tue post-Memorial-Day 04:00 premarket start", time.Date(2026, 5, 26, 4, 0, 0, 0, ny), true, SessionPreMarket},
+		{"Sun before Memorial Day 21:00 closed (Mon is holiday)", time.Date(2026, 5, 24, 21, 0, 0, 0, ny), false, SessionClosed},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			st, err := IsOpen(c.local.Unix(), MarketNASDAQ)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if st.Open != c.wantOpen || st.Session != c.wantSess {
+				t.Errorf("IsOpen = (%v, %v), want (%v, %v)", st.Open, st.Session, c.wantOpen, c.wantSess)
+			}
+		})
+	}
+}
