@@ -14,7 +14,7 @@ function esc(s) {
 
 const MARKET_LABELS = {
   NASDAQ: 'NASDAQ', HKEX: 'HKEX', ChinaAShare: 'SSE/SZSE', TSE: 'TSE',
-  KRX: 'KRX', FX: 'FX', CME: 'CME', ICE: 'ICE',
+  TWSE: 'TWSE', KRX: 'KRX', FX: 'FX', CME: 'CME', ICE: 'ICE',
   FXCMUKOil: 'UK Oil', FXCMUSOil: 'US Oil', Rates: 'Rates', Metals: 'Metals',
 };
 

@@ -14,6 +14,7 @@ const (
 	MarketHKEX        MarketType = "HKEX"
 	MarketChinaAShare MarketType = "ChinaAShare"
 	MarketTSE         MarketType = "TSE"
+	MarketTWSE        MarketType = "TWSE"
 	MarketKRX         MarketType = "KRX"
 	MarketFX          MarketType = "FX"
 	MarketCME         MarketType = "CME"

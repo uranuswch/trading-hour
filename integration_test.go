@@ -19,6 +19,7 @@ func TestTimelineIsOpenConsistency(t *testing.T) {
 		{MarketHKEX, time.Date(2026, 3, 2, 0, 0, 0, 0, time.UTC)},
 		{MarketChinaAShare, time.Date(2026, 3, 2, 0, 0, 0, 0, time.UTC)},
 		{MarketTSE, time.Date(2026, 3, 2, 0, 0, 0, 0, time.UTC)},
+		{MarketTWSE, time.Date(2026, 3, 2, 0, 0, 0, 0, time.UTC)},
 		{MarketKRX, time.Date(2026, 3, 9, 0, 0, 0, 0, time.UTC)},
 	}
 	for _, tc := range markets {

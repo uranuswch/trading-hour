@@ -18,6 +18,7 @@ var allMarkets = []th.MarketType{
 	th.MarketHKEX,
 	th.MarketChinaAShare,
 	th.MarketTSE,
+	th.MarketTWSE,
 	th.MarketKRX,
 	th.MarketFX,
 	th.MarketCME,

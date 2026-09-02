@@ -37,6 +37,7 @@ func main() {
 | HKEX (equity)   | `th.MarketHKEX`          | Asia/Hong_Kong      |
 | SSE + SZSE      | `th.MarketChinaAShare`   | Asia/Shanghai       |
 | Tokyo (TSE)     | `th.MarketTSE`           | Asia/Tokyo          |
+| Taiwan (TWSE)   | `th.MarketTWSE`          | Asia/Taipei         |
 | Korea (KRX)     | `th.MarketKRX`           | Asia/Seoul          |
 | Forex           | `th.MarketFX`            | America/New_York    |
 | CME             | `th.MarketCME`           | America/New_York    |
@@ -47,6 +48,16 @@ func main() {
 | Metals          | `th.MarketMetals`        | America/New_York    |
 
 NASDAQ includes the Blue Ocean ATS overnight session (8pm–4am ET, Sun–Thu).
+
+TWSE covers board-lot equity trading Monday–Friday: `regular` 09:00–13:30
+(no lunch break) and `postmarket` 14:00–14:30 in `Asia/Taipei` (UTC+8).
+The postmarket phase represents the after-hours fixed-price order window;
+orders are matched once at 14:30. Phase starts are inclusive and ends exclusive.
+Pre-open order collection, odd-lot and block trading are outside this schedule.
+The embedded 2026 calendar includes all 18 scheduled weekday closures, including
+the February 12–13 settlement-only days, and has no half-days.
+Sources: [TWSE trading mechanism](https://www.twse.com.tw/en/products/system/trading.html)
+and [2026 holiday calendar](https://www.twse.com.tw/holidaySchedule/holidaySchedule?response=html&queryYear=2026).
 
 ## Web Dashboard
 
@@ -67,7 +78,7 @@ PORT=9000 go run ./cmd/server/
 
 The dashboard auto-refreshes every 30 seconds and shows:
 
-- **Pills** — open/partial/closed status for all 12 markets at a glance
+- **Pills** — open/partial/closed status for all 13 markets at a glance
 - **Spotlight** — countdown to the next market open
 - **Side drawer** — 24-hour timeline bar, session list, and date picker for any market
 
