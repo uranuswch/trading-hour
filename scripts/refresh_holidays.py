@@ -21,6 +21,7 @@ MARKETS = {
     "HKEX":        ("XHKG", "hkex"),
     "ChinaAShare": ("XSHG", "china-ashare"),
     "TSE":         ("XTKS", "tse"),
+    "TWSE":        ("XTAI", "twse"),
     "KRX":         ("XKRX", "krx"),
     "CME":         ("CME", "cme"),
     "ICE":         ("XICE", "ice"),

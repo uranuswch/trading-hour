@@ -56,6 +56,50 @@ func TestHandleTimeline_withDate(t *testing.T) {
 	}
 }
 
+func TestHandleTimeline_TWSE(t *testing.T) {
+	cases := []struct {
+		date      string
+		isHoliday bool
+		phases    []phaseItem
+	}{
+		{"2026-03-02", false, []phaseItem{
+			{Session: "regular", Start: "2026-03-02T09:00:00+08:00", End: "2026-03-02T13:30:00+08:00"},
+			{Session: "postmarket", Start: "2026-03-02T14:00:00+08:00", End: "2026-03-02T14:30:00+08:00"},
+		}},
+		{"2026-02-12", true, []phaseItem{}},
+		{"2026-03-07", false, []phaseItem{}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.date, func(t *testing.T) {
+			req := httptest.NewRequest("GET", "/api/timeline/TWSE?date="+tc.date, nil)
+			req.SetPathValue("market", "TWSE")
+			w := httptest.NewRecorder()
+			handleTimeline(w, req)
+			if w.Code != http.StatusOK {
+				t.Fatalf("expected 200, got %d: %s", w.Code, w.Body)
+			}
+			var resp timelineResponse
+			if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+				t.Fatal(err)
+			}
+			if resp.Market != "TWSE" || resp.Date != tc.date || resp.Timezone != "Asia/Taipei" {
+				t.Errorf("unexpected market, date or timezone: %+v", resp)
+			}
+			if resp.IsHoliday != tc.isHoliday || resp.IsHalfDay || (resp.HolidayName != "") != tc.isHoliday {
+				t.Errorf("unexpected holiday metadata: %+v", resp)
+			}
+			if resp.Phases == nil || len(resp.Phases) != len(tc.phases) {
+				t.Fatalf("phases = %+v, want %+v", resp.Phases, tc.phases)
+			}
+			for i, phase := range resp.Phases {
+				if phase != tc.phases[i] {
+					t.Errorf("phase[%d] = %+v, want %+v", i, phase, tc.phases[i])
+				}
+			}
+		})
+	}
+}
+
 func TestHandleTimeline_unknownMarket(t *testing.T) {
 	req := httptest.NewRequest("GET", "/api/timeline/UNKNOWN", nil)
 	req.SetPathValue("market", "UNKNOWN")
@@ -100,29 +144,36 @@ func TestHandleStatus_returnsAllMarkets(t *testing.T) {
 			t.Errorf("missing market %s in response", m)
 		}
 	}
+	if !seen["TWSE"] {
+		t.Error("missing Taiwan market in response")
+	}
 }
 
 func TestHandleNextOpen_returnsTime(t *testing.T) {
-	req := httptest.NewRequest("GET", "/api/nextopen/HKEX", nil)
-	req.SetPathValue("market", "HKEX")
-	w := httptest.NewRecorder()
-	handleNextOpen(w, req)
+	for _, market := range []string{"HKEX", "TWSE"} {
+		t.Run(market, func(t *testing.T) {
+			req := httptest.NewRequest("GET", "/api/nextopen/"+market, nil)
+			req.SetPathValue("market", market)
+			w := httptest.NewRecorder()
+			handleNextOpen(w, req)
 
-	if w.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body)
-	}
-	var resp nextOpenResponse
-	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
-		t.Fatal(err)
-	}
-	if resp.Market != "HKEX" {
-		t.Errorf("expected HKEX, got %s", resp.Market)
-	}
-	if resp.Time == "" {
-		t.Error("empty time field")
-	}
-	if resp.Local == "" {
-		t.Error("empty local field")
+			if w.Code != http.StatusOK {
+				t.Fatalf("expected 200, got %d: %s", w.Code, w.Body)
+			}
+			var resp nextOpenResponse
+			if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+				t.Fatal(err)
+			}
+			if resp.Market != market {
+				t.Errorf("expected %s, got %s", market, resp.Market)
+			}
+			if resp.Time == "" {
+				t.Error("empty time field")
+			}
+			if resp.Local == "" {
+				t.Error("empty local field")
+			}
+		})
 	}
 }
 

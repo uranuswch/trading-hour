@@ -1,0 +1,15 @@
+# Source: https://www.twse.com.tw/en/products/system/trading.html
+# Board-lot regular trading and the after-hours fixed-price order window.
+# After-hours orders are matched once at 14:30; there is no lunch break.
+market: TWSE
+timezone: Asia/Taipei
+weekly_schedule:
+  monday: &tw_full
+    - {session: regular,    start: "09:00", end: "13:30"}
+    - {session: postmarket, start: "14:00", end: "14:30"}
+  tuesday: *tw_full
+  wednesday: *tw_full
+  thursday: *tw_full
+  friday: *tw_full
+  saturday: []
+  sunday: []

@@ -11,6 +11,7 @@ func TestMarketTypeConstants(t *testing.T) {
 		MarketHKEX:        "HKEX",
 		MarketChinaAShare: "ChinaAShare",
 		MarketTSE:         "TSE",
+		MarketTWSE:        "TWSE",
 		MarketKRX:         "KRX",
 		MarketFX:          "FX",
 		MarketCME:         "CME",

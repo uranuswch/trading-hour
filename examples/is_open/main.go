@@ -18,6 +18,7 @@ func main() {
 		tradinghour.MarketHKEX,
 		tradinghour.MarketChinaAShare,
 		tradinghour.MarketTSE,
+		tradinghour.MarketTWSE,
 		tradinghour.MarketKRX,
 		tradinghour.MarketCME,
 		tradinghour.MarketFX,
@@ -54,4 +55,5 @@ func main() {
 // HKEX           : CLOSED (session: closed)
 // ChinaAShare    : CLOSED (session: closed)
 // TSE            : CLOSED (session: closed)
+// TWSE           : CLOSED (session: closed)
 // KRX            : CLOSED (session: closed)
