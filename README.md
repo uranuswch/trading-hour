@@ -1,12 +1,37 @@
 # tradinghour
 
-Go library for global market trading hours. Tells you whether a market is open at a given instant, which session is active (premarket / regular / postmarket / overnight), and the full trading timeline for any date.
+Go and Rust libraries for global market trading hours. Both embed the same reviewed YAML calendars and tell you whether a market is open at a given instant, which session is active (premarket / regular / postmarket / overnight), and the full trading timeline for any date.
 
 ## Install
+
+### Go
 
 ```bash
 go get github.com/uranuswch/trading-hour
 ```
+
+### Rust
+
+The native Rust crate lives in this repository. Pin a reviewed full commit SHA:
+
+```toml
+[dependencies]
+trading-hour = { git = "https://github.com/uranuswch/trading-hour", rev = "<reviewed-commit-sha>" }
+```
+
+```rust
+use trading_hour::{is_open, Market, Session};
+
+fn main() -> Result<(), trading_hour::Error> {
+    let status = is_open(1789455600, Market::Krx)?;
+    assert!(status.open);
+    assert_eq!(status.session, Session::PostMarket);
+    Ok(())
+}
+```
+
+Rust 1.85 or newer is required. See [Rust API and maintenance](docs/rust-library.md)
+for timeline queries, calendar coverage, packaging, and cross-language verification.
 
 ## Usage
 
@@ -106,6 +131,30 @@ date (`YYYY-MM-DD`, inclusive in the market's timezone) and a complete
 schedule; omitted weekdays are closed. Earlier dates use the base schedule.
 Holiday closures and `half_day_schedule` still apply. See `data/markets/krx.yaml`
 for an example. Other markets retain their existing unversioned schedules.
+
+Go and Rust use this directory directly; there is no second calendar copy. Updating
+these files takes effect when consumers upgrade their pinned dependency and rebuild.
+Calendar coverage is limited to the embedded years. Outside those years both
+implementations use the weekly schedule; Rust exposes `holiday_years` so consumers
+can report missing coverage. A market-level open phase does not establish an
+individual instrument's eligibility, entitlement, halt status, or quote freshness.
+
+## Verification
+
+```sh
+go test -race ./...
+cargo fmt --all -- --check
+cargo clippy --locked --all-targets --all-features -- -D warnings
+cargo test --locked --all-targets --all-features
+cargo test --locked --doc
+python3 scripts/check_parity.py
+cargo package --locked
+```
+
+The parity check compares all 13 markets over the entire embedded 2026 year,
+including surrounding year boundaries, every phase start/end and fixed UTC probes.
+It verifies status, timeline metadata and offsets, next open, and next close against
+the existing Go implementation. All query tests run offline with embedded data.
 
 ## Design
 

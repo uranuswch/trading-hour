@@ -7,6 +7,7 @@
 /timeline
 /server
 /cmd/server/server
+/target/
 
 # Editor
 .idea/

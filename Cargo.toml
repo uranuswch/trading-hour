@@ -1,0 +1,30 @@
+[package]
+name = "trading-hour"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Embedded global market trading schedules and holiday calendars"
+license = "MIT"
+repository = "https://github.com/uranuswch/trading-hour"
+readme = "README.md"
+include = ["rust/**", "data/**", "build.rs", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE", "testdata/**"]
+
+[lib]
+path = "rust/src/lib.rs"
+
+[[example]]
+name = "parity"
+path = "rust/examples/parity.rs"
+
+[[test]]
+name = "calendar"
+path = "rust/tests/calendar.rs"
+
+[dependencies]
+chrono = { version = "0.4", default-features = false, features = ["std"] }
+chrono-tz = "0.10"
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.9"
+
+[dev-dependencies]
+serde_json = "1"

@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Go, Rust, calendar parity, package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version-file: go.mod
+      - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772
+        with:
+          toolchain: "1.97"
+          components: rustfmt, clippy
+      - name: Rust format
+        run: cargo fmt --all -- --check
+      - name: Rust lint
+        run: cargo clippy --locked --all-targets --all-features -- -D warnings
+      - name: Rust tests
+        run: cargo test --locked --all-targets --all-features
+      - name: Rust documentation tests
+        run: cargo test --locked --doc
+      - name: Go race tests
+        run: go test -race ./...
+      - name: Go and Rust public API parity
+        run: python3 scripts/check_parity.py
+      - name: Verify packaged Rust crate
+        run: cargo package --locked
+
+  msrv:
+    name: Rust 1.85 compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772
+        with:
+          toolchain: "1.85.0"
+      - run: cargo check --locked --lib --all-features
