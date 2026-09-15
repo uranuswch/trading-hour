@@ -4,11 +4,19 @@ import "time"
 
 // Market holds all compiled schedule and holiday data for a single market.
 type Market struct {
-	Type          MarketType
-	Location      *time.Location
-	WeeklyPhases  [7][]compiledPhase // index = int(time.Weekday); Sunday = 0
-	HalfDayPhases []compiledPhase    // nil if market has no half-day support
-	Holidays      map[civilDate]holidayEntry
+	Type            MarketType
+	Location        *time.Location
+	WeeklyPhases    [7][]compiledPhase // index = int(time.Weekday); Sunday = 0
+	HalfDayPhases   []compiledPhase    // nil if market has no half-day support
+	Holidays        map[civilDate]holidayEntry
+	weeklyOverrides []weeklyScheduleOverride // sorted by EffectiveFrom, ascending
+}
+
+// weeklyScheduleOverride replaces the full weekly schedule from a market-local date.
+// Holiday closures and the market's half-day schedule still take precedence.
+type weeklyScheduleOverride struct {
+	EffectiveFrom time.Time
+	WeeklyPhases  [7][]compiledPhase
 }
 
 // registry is populated by loader.go's init().
@@ -35,6 +43,12 @@ func (m *Market) materialize(date time.Time) (phases []Phase, isHoliday bool, is
 	y, mo, d := date.Date()
 	localMidnight := time.Date(y, mo, d, 0, 0, 0, 0, m.Location)
 	weekly := m.WeeklyPhases[int(localMidnight.Weekday())]
+	for _, override := range m.weeklyOverrides {
+		if localMidnight.Before(override.EffectiveFrom) {
+			break
+		}
+		weekly = override.WeeklyPhases[int(localMidnight.Weekday())]
+	}
 	nextDayClosed := m.isClosedHoliday(localMidnight.AddDate(0, 0, 1))
 
 	var dayPhases []compiledPhase

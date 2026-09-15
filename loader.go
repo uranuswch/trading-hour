@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"path"
+	"slices"
 	"strings"
 	"time"
 
@@ -15,10 +16,16 @@ import (
 var dataFS embed.FS
 
 type scheduleFile struct {
-	Market          string                 `yaml:"market"`
-	Timezone        string                 `yaml:"timezone"`
-	WeeklySchedule  map[string][]phaseYAML `yaml:"weekly_schedule"`
-	HalfDaySchedule []phaseYAML            `yaml:"half_day_schedule"`
+	Market          string                       `yaml:"market"`
+	Timezone        string                       `yaml:"timezone"`
+	WeeklySchedule  map[string][]phaseYAML       `yaml:"weekly_schedule"`
+	WeeklyOverrides []weeklyScheduleOverrideYAML `yaml:"weekly_schedule_overrides"`
+	HalfDaySchedule []phaseYAML                  `yaml:"half_day_schedule"`
+}
+
+type weeklyScheduleOverrideYAML struct {
+	EffectiveFrom  string                 `yaml:"effective_from"`
+	WeeklySchedule map[string][]phaseYAML `yaml:"weekly_schedule"`
 }
 
 type phaseYAML struct {
@@ -68,39 +75,81 @@ func loadMarket(p string) error {
 	if err != nil {
 		return fmt.Errorf("tradinghour: read %s: %w", p, err)
 	}
+	m, err := parseMarket(raw, p)
+	if err != nil {
+		return err
+	}
+	registry[m.Type] = m
+	return nil
+}
+
+func parseMarket(raw []byte, p string) (*Market, error) {
 	var sf scheduleFile
 	if err := yaml.Unmarshal(raw, &sf); err != nil {
-		return fmt.Errorf("tradinghour: parse %s: %w", p, err)
+		return nil, fmt.Errorf("tradinghour: parse %s: %w", p, err)
 	}
 	loc, err := time.LoadLocation(sf.Timezone)
 	if err != nil {
-		return fmt.Errorf("tradinghour: load tz %q: %w", sf.Timezone, err)
+		return nil, fmt.Errorf("tradinghour: load tz %q: %w", sf.Timezone, err)
 	}
 	m := &Market{
 		Type:     MarketType(sf.Market),
 		Location: loc,
 		Holidays: map[civilDate]holidayEntry{},
 	}
-	for dayName, phases := range sf.WeeklySchedule {
-		wd, ok := weekdayByName[strings.ToLower(dayName)]
-		if !ok {
-			return fmt.Errorf("tradinghour: unknown weekday %q in %s", dayName, p)
-		}
-		cps, err := compilePhases(phases, p)
+	m.WeeklyPhases, err = compileWeeklySchedule(sf.WeeklySchedule, p)
+	if err != nil {
+		return nil, err
+	}
+	for _, override := range sf.WeeklyOverrides {
+		effectiveFrom, err := time.ParseInLocation(time.DateOnly, override.EffectiveFrom, loc)
 		if err != nil {
-			return err
+			return nil, fmt.Errorf("tradinghour: %s: bad effective_from %q: %w", p, override.EffectiveFrom, err)
 		}
-		m.WeeklyPhases[int(wd)] = cps
+		if override.WeeklySchedule == nil {
+			return nil, fmt.Errorf("tradinghour: %s: weekly_schedule is required for effective_from %q", p, override.EffectiveFrom)
+		}
+		weekly, err := compileWeeklySchedule(override.WeeklySchedule, p)
+		if err != nil {
+			return nil, err
+		}
+		m.weeklyOverrides = append(m.weeklyOverrides, weeklyScheduleOverride{
+			EffectiveFrom: effectiveFrom,
+			WeeklyPhases:  weekly,
+		})
+	}
+	slices.SortFunc(m.weeklyOverrides, func(a, b weeklyScheduleOverride) int {
+		return a.EffectiveFrom.Compare(b.EffectiveFrom)
+	})
+	for i := 1; i < len(m.weeklyOverrides); i++ {
+		if m.weeklyOverrides[i].EffectiveFrom.Equal(m.weeklyOverrides[i-1].EffectiveFrom) {
+			return nil, fmt.Errorf("tradinghour: %s: duplicate effective_from %q", p, m.weeklyOverrides[i].EffectiveFrom.Format(time.DateOnly))
+		}
 	}
 	if len(sf.HalfDaySchedule) > 0 {
 		cps, err := compilePhases(sf.HalfDaySchedule, p)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		m.HalfDayPhases = cps
 	}
-	registry[m.Type] = m
-	return nil
+	return m, nil
+}
+
+func compileWeeklySchedule(schedule map[string][]phaseYAML, srcPath string) ([7][]compiledPhase, error) {
+	var weekly [7][]compiledPhase
+	for dayName, phases := range schedule {
+		wd, ok := weekdayByName[strings.ToLower(dayName)]
+		if !ok {
+			return weekly, fmt.Errorf("tradinghour: unknown weekday %q in %s", dayName, srcPath)
+		}
+		cps, err := compilePhases(phases, srcPath)
+		if err != nil {
+			return weekly, err
+		}
+		weekly[int(wd)] = cps
+	}
+	return weekly, nil
 }
 
 func compilePhases(ps []phaseYAML, srcPath string) ([]compiledPhase, error) {

@@ -59,6 +59,18 @@ the February 12–13 settlement-only days, and has no half-days.
 Sources: [TWSE trading mechanism](https://www.twse.com.tw/en/products/system/trading.html)
 and [2026 holiday calendar](https://www.twse.com.tw/holidaySchedule/holidaySchedule?response=html&queryYear=2026).
 
+KRX uses `Asia/Seoul` (UTC+9): `premarket` 08:00–09:00,
+`regular` 09:00–15:30, and `postmarket` 15:40–20:00 from September 14, 2026.
+Earlier dates retain the 18:00 postmarket close. The postmarket phase combines
+closing-price trading (15:40–16:00) with continuous after-market trading
+(16:00–20:00), which replaces the former 16:00–18:00 single-price auctions.
+Phase starts are inclusive and ends exclusive; weekends and holidays remain closed.
+The continuous after-market covers eligible equities and initially excludes
+ETFs, ETNs, and other restricted securities. This is a market-level schedule;
+callers must check individual security eligibility separately.
+Sources: [KRX trading hours](https://global.krx.co.kr/contents/GLB/06/0602/0602020204/GLB0602020204T1.jsp)
+and [September 14 launch notice](https://www.samsungpop.com/ux/kor/customer/notice/notice/noticeViewContent.do?MenuSeqNo=24420).
+
 ## Web Dashboard
 
 A live market-status dashboard is included in `web/static/` and served by a small Go HTTP server in `cmd/server/`.
@@ -87,6 +99,13 @@ The server binary embeds `web/static/` via `go:embed`, so it has no working-dire
 ## Data
 
 Market schedules and holiday calendars live in `data/` as YAML and are embedded into the binary via `go:embed`. A GitHub Action runs yearly (November 15) to open a PR generating next-year holidays from [`exchange_calendars`](https://pypi.org/project/exchange-calendars/). PRs require human review before merge.
+
+Schedules may include `weekly_schedule_overrides`, each with an `effective_from`
+date (`YYYY-MM-DD`, inclusive in the market's timezone) and a complete
+`weekly_schedule`. The latest applicable override replaces the base weekly
+schedule; omitted weekdays are closed. Earlier dates use the base schedule.
+Holiday closures and `half_day_schedule` still apply. See `data/markets/krx.yaml`
+for an example. Other markets retain their existing unversioned schedules.
 
 ## Design
 
