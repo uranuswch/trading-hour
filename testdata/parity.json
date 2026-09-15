@@ -1,0 +1,5 @@
+{
+  "markets": ["NASDAQ", "HKEX", "ChinaAShare", "TSE", "TWSE", "KRX", "FX", "CME", "ICE", "FXCMUKOil", "FXCMUSOil", "Rates", "Metals"],
+  "start": "2025-12-20",
+  "end": "2027-01-10"
+}
