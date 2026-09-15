@@ -100,6 +100,54 @@ func TestHandleTimeline_TWSE(t *testing.T) {
 	}
 }
 
+func TestHandleTimeline_KRXExtendedHours(t *testing.T) {
+	cases := []struct {
+		date      string
+		closeTime string
+		holiday   bool
+	}{
+		{"2026-09-11", "18:00", false},
+		{"2026-09-14", "20:00", false},
+		{"2026-09-19", "", false},
+		{"2026-09-24", "", true},
+	}
+	for _, tc := range cases {
+		t.Run(tc.date, func(t *testing.T) {
+			req := httptest.NewRequest("GET", "/api/timeline/KRX?date="+tc.date, nil)
+			req.SetPathValue("market", "KRX")
+			w := httptest.NewRecorder()
+			handleTimeline(w, req)
+			if w.Code != http.StatusOK {
+				t.Fatalf("expected 200, got %d: %s", w.Code, w.Body)
+			}
+			var resp timelineResponse
+			if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+				t.Fatal(err)
+			}
+			if resp.Market != "KRX" || resp.Date != tc.date || resp.Timezone != "Asia/Seoul" ||
+				resp.IsHoliday != tc.holiday || resp.IsHalfDay || (resp.HolidayName != "") != tc.holiday {
+				t.Errorf("unexpected timeline metadata: %+v", resp)
+			}
+			want := []phaseItem{}
+			if tc.closeTime != "" {
+				want = []phaseItem{
+					{Session: "premarket", Start: tc.date + "T08:00:00+09:00", End: tc.date + "T09:00:00+09:00"},
+					{Session: "regular", Start: tc.date + "T09:00:00+09:00", End: tc.date + "T15:30:00+09:00"},
+					{Session: "postmarket", Start: tc.date + "T15:40:00+09:00", End: tc.date + "T" + tc.closeTime + ":00+09:00"},
+				}
+			}
+			if resp.Phases == nil || len(resp.Phases) != len(want) {
+				t.Fatalf("phases = %+v, want %+v", resp.Phases, want)
+			}
+			for i, phase := range resp.Phases {
+				if phase != want[i] {
+					t.Errorf("phase[%d] = %+v, want %+v", i, phase, want[i])
+				}
+			}
+		})
+	}
+}
+
 func TestHandleTimeline_unknownMarket(t *testing.T) {
 	req := httptest.NewRequest("GET", "/api/timeline/UNKNOWN", nil)
 	req.SetPathValue("market", "UNKNOWN")
