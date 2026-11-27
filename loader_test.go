@@ -26,8 +26,8 @@ func TestRegistryLoaded(t *testing.T) {
 	if got := len(m.WeeklyPhases[int(6)]); got != 0 { // Saturday
 		t.Errorf("Saturday phases = %d, want 0", got)
 	}
-	if len(m.HalfDayPhases) != 2 {
-		t.Errorf("HalfDayPhases len = %d, want 2", len(m.HalfDayPhases))
+	if len(m.HalfDayPhases) != 3 {
+		t.Errorf("HalfDayPhases len = %d, want 3", len(m.HalfDayPhases))
 	}
 }
 
