@@ -48,11 +48,11 @@ func TestTimelineBlackFridayHalfDay(t *testing.T) {
 	if ds.IsHoliday || !ds.IsHalfDay {
 		t.Errorf("flags = (%v, %v)", ds.IsHoliday, ds.IsHalfDay)
 	}
-	if len(ds.Phases) != 2 {
+	if len(ds.Phases) != 3 {
 		t.Fatalf("phases = %d", len(ds.Phases))
 	}
-	if ds.Phases[1].End.Hour() != 17 {
-		t.Errorf("postmarket end = %v", ds.Phases[1].End)
+	if ds.Phases[2].End.Hour() != 17 {
+		t.Errorf("postmarket end = %v", ds.Phases[2].End)
 	}
 }
 

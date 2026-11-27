@@ -17,5 +17,6 @@ weekly_schedule:
   sunday:
     - {session: overnight,  start: "20:00", end: "04:00+1"}
 half_day_schedule:
+  - {session: premarket,  start: "04:00", end: "09:30"}
   - {session: regular,    start: "09:30", end: "13:00"}
   - {session: postmarket, start: "13:00", end: "17:00"}

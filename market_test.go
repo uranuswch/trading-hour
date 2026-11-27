@@ -66,11 +66,11 @@ func TestMaterializeHalfDay(t *testing.T) {
 	if name == "" {
 		t.Error("name empty")
 	}
-	if len(phases) != 2 {
-		t.Fatalf("phases len = %d, want 2", len(phases))
+	if len(phases) != 3 {
+		t.Fatalf("phases len = %d, want 3", len(phases))
 	}
-	if phases[0].Session != SessionRegular ||
-		phases[0].End.Hour() != 13 {
-		t.Errorf("phases[0] = %+v", phases[0])
+	if phases[1].Session != SessionRegular ||
+		phases[1].End.Hour() != 13 {
+		t.Errorf("phases[1] = %+v", phases[1])
 	}
 }

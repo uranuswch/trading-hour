@@ -133,8 +133,10 @@ fn timeline_and_next_boundaries_retain_local_time_and_half_days() {
     let half = timeline(date("2026-11-27"), Market::Nasdaq).unwrap();
     assert!(half.is_half_day);
     assert!(!half.is_holiday);
-    assert_eq!(half.phases[0].end.hour(), 13);
-    assert_eq!(half.phases.len(), 2);
+    assert_eq!(half.phases.len(), 3);
+    assert_eq!(half.phases[0].session, Session::PreMarket);
+    assert_eq!(half.phases[0].start.hour(), 4);
+    assert_eq!(half.phases[1].end.hour(), 13);
     assert_eq!(
         next_close(at("2026-11-27T12:00:00-05:00"), Market::Nasdaq)
             .unwrap()
